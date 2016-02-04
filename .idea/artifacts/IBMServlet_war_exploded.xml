@@ -1,0 +1,40 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="IBMServlet:war exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/IBMServlet_war_exploded</output-path>
+    <root id="root">
+      <element id="javaee-facet-resources" facet="NewRelicServlet/web/Web" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="NewRelicServlet" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="application" name="lib" />
+          <element id="library" level="application" name="java-json" />
+          <element id="library" level="application" name="db2jcc4" />
+          <element id="file-copy" path="E:/Android/httpcomponents-client-4.5.1/lib/jna-4.1.0.jar" />
+          <element id="file-copy" path="E:/Android/httpcomponents-client-4.5.1/lib/httpcore-4.4.3.jar" />
+          <element id="file-copy" path="E:/Android/httpcomponents-client-4.5.1/lib/httpmime-4.5.1.jar" />
+          <element id="file-copy" path="E:/Android/httpcomponents-client-4.5.1/lib/fluent-hc-4.5.1.jar" />
+          <element id="file-copy" path="E:/Android/httpcomponents-client-4.5.1/lib/httpclient-4.5.1.jar" />
+          <element id="file-copy" path="E:/Android/httpcomponents-client-4.5.1/lib/commons-codec-1.9.jar" />
+          <element id="file-copy" path="E:/Android/httpcomponents-client-4.5.1/lib/jna-platform-4.1.0.jar" />
+          <element id="file-copy" path="E:/Android/httpcomponents-client-4.5.1/lib/commons-logging-1.2.jar" />
+          <element id="file-copy" path="E:/Android/httpcomponents-client-4.5.1/lib/httpclient-win-4.5.1.jar" />
+          <element id="file-copy" path="E:/Android/httpcomponents-client-4.5.1/lib/httpclient-cache-4.5.1.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/javax.ejb.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/javax.jms.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/javax.servlet.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/javax.resource.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/javax.annotation.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/javax.persistence.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/javax.servlet.jsp.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/javax.transaction.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/javax.servlet.jsp.jstl.jar" />
+          <element id="file-copy" path="E:/Android/java-json.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/perfutils.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/lib/joda-time-2.9.jar" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>
