@@ -1,11 +1,13 @@
 package operations;
 
-
 import com.ibm.perf.utils.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+
+import java.sql.Timestamp;
+
 
 /** This class is used to format the joda Instants */
 public final class TimestampUtils {
@@ -21,7 +23,7 @@ public final class TimestampUtils {
     }
 
 
-    public static Instant parseTimestamp(String value, Instant defaultValue) {
+    public static Timestamp parseTimestamp(String value, Timestamp defaultValue) {
         String cleanValue = StringUtils.clean(value).toUpperCase();
 
         if (cleanValue.isEmpty()) {
@@ -29,12 +31,11 @@ public final class TimestampUtils {
         }
 
         try {
-            return new Instant(format(DateTime.parse(value).toInstant()));
+            return new Timestamp(new Instant(format(DateTime.parse(value).toInstant())).getMillis());
         } catch (NumberFormatException e) {
             /* Fail silently */
         }
 
         return defaultValue;
     }
-
 }

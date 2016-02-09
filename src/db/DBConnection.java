@@ -50,7 +50,7 @@ public class DBConnection {
         if (statement.execute("SELECT * FROM " + table + " WHERE " +
                 "ENVIRONMENT = '" + env + "'" +
                 " AND APPNAME = '" + app + "'"+
-                " AND PERIOD_END >= '" + firstPeriod + "'" +
+                " AND RETRIEVED >= '" + firstPeriod + "'" +
                 " AND PERIOD_END <= '" + lastPeriod + "'")) {
             while (statement.getResultSet().next()) {
                 entries.add(new ThroughputEntry(statement.getResultSet()));

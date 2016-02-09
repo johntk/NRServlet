@@ -39,19 +39,23 @@ public class PreProcessor extends HttpServlet {
         String json = "";
         String sDate = request.getParameter("start");
         String eDate = request.getParameter("end");
+        String app = request.getParameter("app");
+        String env = request.getParameter("env");
+        System.out.println("App : " + app);
+        System.out.println("Start Date : " + sDate);
+        System.out.println("End Date : " + eDate);
 
-        Instant from =  TimestampUtils.parseTimestamp(sDate, null);
-        Instant to = TimestampUtils.parseTimestamp(eDate, null);
+//        Instant from =  TimestampUtils.parseTimestamp(sDate,null);
+//        Instant to = TimestampUtils.parseTimestamp(eDate,null);
 
-        String env = "A3";
-        String app = "actwebui";
-
-        if (from != null && to != null) {
+        if (sDate != null && eDate != null) {
+            Timestamp from = TimestampUtils.parseTimestamp(sDate, null);
+            Timestamp to = TimestampUtils.parseTimestamp(eDate, null);
             System.out.println("Start Date : " + from);
             System.out.println("End Date : " + to);
 
             try {
-                throughPutList = interop.getThroughputEntriesInTimespan(env, app, new Timestamp(from.getMillis()), new Timestamp(to.getMillis()));
+                throughPutList = interop.getThroughputEntriesInTimespan(env, app, from, to);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -75,7 +79,8 @@ public class PreProcessor extends HttpServlet {
                 json = "No record found";
             }
         } else {
-            json = "Date must be selected.";
+            json = "Date must be selected." + "App : " + app + " " + eDate;
+
         }
         response.getWriter().write(json);
     }
