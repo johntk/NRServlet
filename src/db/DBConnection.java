@@ -1,12 +1,10 @@
 package db;
 
-import model.HistoryEntry;
 import model.ThroughputEntry;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class DBConnection {
 
@@ -17,13 +15,14 @@ public class DBConnection {
 
 
     /** Set the table name for applications */
-    public static DBConnection createApplication() {
+    public  static DBConnection createApplication() {
         return new DBConnection("APPLICATIONDATA");
     }
 
     public DBConnection(String table) {
         this.table =  String.format("NRDATA.%s", table);
     }
+
 
     public Connection getConnection() throws IllegalAccessException,
             InstantiationException, ClassNotFoundException, SQLException {
@@ -41,10 +40,9 @@ public class DBConnection {
     }
 
 
-    public List<ThroughputEntry> getThroughputEntriesInTimespan(String env, String app, Timestamp firstPeriod, Timestamp lastPeriod) throws Exception {
-        List<ThroughputEntry> entries = new ArrayList<ThroughputEntry>();
+    public List<ThroughputEntry> getThroughputEntriesInTimespan(String env, String app, Timestamp firstPeriod, Timestamp lastPeriod, Connection connection) throws Exception {
+        List<ThroughputEntry> entries = new ArrayList<>();
 
-        Connection connection = getConnection();
         Statement statement = connection.createStatement();
 
         if (statement.execute("SELECT * FROM " + table + " WHERE " +
@@ -54,6 +52,7 @@ public class DBConnection {
                 " AND PERIOD_END <= '" + lastPeriod + "'")) {
             while (statement.getResultSet().next()) {
                 entries.add(new ThroughputEntry(statement.getResultSet()));
+
             }
         } else {
             return null;
@@ -61,5 +60,4 @@ public class DBConnection {
 
         return entries;
     }
-
 }
