@@ -42,8 +42,8 @@ public class PreProcessor extends HttpServlet {
         System.out.println("End Date : " + eDate);
         try (Connection connection = dbWork.getConnection()) {
 
-            ThroughputJSON chart = new ThroughputJSON();
-            String json = chart.TotalThroughput(sDate, eDate, env, app, connection, dbWork);
+            ThroughputJSON chart = new ThroughputJSON(sDate, eDate, env, app, connection, dbWork);
+            String json = chart.Generate("maxChart");
             System.out.println("json : " + json);
             response.getWriter().write(json);
 
