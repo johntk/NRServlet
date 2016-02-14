@@ -32,7 +32,7 @@
         <entry file="file://$PROJECT_DIR$/src/operations/PreProcessor.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="39" column="43" selection-start-line="39" selection-start-column="43" selection-end-line="39" selection-end-column="43" />
+              <caret line="25" column="13" selection-start-line="25" selection-start-column="13" selection-end-line="25" selection-end-column="13" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#561#562#0" expanded="true" />
@@ -45,49 +45,8 @@
       <file leaf-file-name="ThroughputJSON.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/operations/ThroughputJSON.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.17720531">
-              <caret line="107" column="9" selection-start-line="107" selection-start-column="9" selection-end-line="107" selection-end-column="9" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DBConnection.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/db/DBConnection.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-26.37931">
-              <caret line="45" column="59" selection-start-line="45" selection-start-column="59" selection-end-line="45" selection-end-column="59" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#466#467#0" expanded="true" />
-                <element signature="e#524#525#0" expanded="true" />
-                <element signature="e#565#566#0" expanded="true" />
-                <element signature="e#628#629#0" expanded="true" />
-                <marker date="1455391367296" expanded="true" signature="1520:1770" placeholder="SELECT * FRO..missingValue..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="HistoryEntry.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/model/HistoryEntry.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="38" column="34" selection-start-line="38" selection-start-column="29" selection-end-line="38" selection-end-column="41" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="TimestampUtils.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/operations/TimestampUtils.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="39" column="5" selection-start-line="39" selection-start-column="5" selection-end-line="39" selection-end-column="5" />
+            <state vertical-scroll-proportion="0.21832061">
+              <caret line="77" column="16" selection-start-line="77" selection-start-column="16" selection-end-line="77" selection-end-column="16" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -120,12 +79,12 @@
         <option value="$PROJECT_DIR$/src/PreProcessor.java" />
         <option value="$PROJECT_DIR$/src/db/ThroughputEntry.java" />
         <option value="$PROJECT_DIR$/src/db/HistoryEntry.java" />
-        <option value="$PROJECT_DIR$/src/model/HistoryEntry.java" />
         <option value="$PROJECT_DIR$/src/model/Environment.java" />
         <option value="$PROJECT_DIR$/src/operations/JSONResponse.java" />
         <option value="$PROJECT_DIR$/web/WEB-INF/web.xml" />
         <option value="$PROJECT_DIR$/src/operations/TimestampUtils.java" />
         <option value="$PROJECT_DIR$/src/db/DBConnection.java" />
+        <option value="$PROJECT_DIR$/src/model/HistoryEntry.java" />
         <option value="$PROJECT_DIR$/src/operations/PreProcessor.java" />
         <option value="$PROJECT_DIR$/src/operations/ThroughputJSON.java" />
       </list>
@@ -146,8 +105,8 @@
     <order />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="451" />
-    <option name="width" value="2116" />
+    <option name="x" value="1273" />
+    <option name="width" value="1294" />
     <option name="height" value="1447" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
@@ -754,15 +713,15 @@
       <workItem from="1454951120212" duration="11280000" />
       <workItem from="1455061803688" duration="334000" />
       <workItem from="1455063755813" duration="37000" />
-      <workItem from="1455217429267" duration="54388000" />
+      <workItem from="1455217429267" duration="72167000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="224193000" />
+    <option name="totallyTimeSpent" value="241972000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="451" y="0" width="2116" height="1447" extended-state="0" />
+    <frame x="1273" y="0" width="1294" height="1447" extended-state="1" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -777,7 +736,7 @@
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.38714498" sideWeight="0.5246672" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.13" sideWeight="0.4922049" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21361503" sideWeight="0.4922049" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.18779343" sideWeight="0.5077951" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32884902" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -806,7 +765,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="3" />
+      <option name="time" value="4" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -1201,19 +1160,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/model/HistoryEntry.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="38" column="34" selection-start-line="38" selection-start-column="29" selection-end-line="38" selection-end-column="41" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/operations/TimestampUtils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
+        <state vertical-scroll-proportion="0.48015267">
           <caret line="39" column="5" selection-start-line="39" selection-start-column="5" selection-end-line="39" selection-end-column="5" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -1221,9 +1170,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/model/HistoryEntry.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0389313">
+          <caret line="3" column="29" selection-start-line="3" selection-start-column="29" selection-end-line="3" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/db/DBConnection.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-26.37931">
+        <state vertical-scroll-proportion="0.5971897">
           <caret line="45" column="59" selection-start-line="45" selection-start-column="59" selection-end-line="45" selection-end-column="59" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -1231,7 +1188,7 @@
             <element signature="e#524#525#0" expanded="true" />
             <element signature="e#565#566#0" expanded="true" />
             <element signature="e#628#629#0" expanded="true" />
-            <marker date="1455391367296" expanded="true" signature="1520:1770" placeholder="SELECT * FRO..missingValue..." />
+            <marker date="1455391367296" expanded="true" signature="-1:-1" placeholder="SELECT * FRO..missingValue..." />
           </folding>
         </state>
       </provider>
@@ -1239,7 +1196,7 @@
     <entry file="file://$PROJECT_DIR$/src/operations/PreProcessor.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="39" column="43" selection-start-line="39" selection-start-column="43" selection-end-line="39" selection-end-column="43" />
+          <caret line="25" column="13" selection-start-line="25" selection-start-column="13" selection-end-line="25" selection-end-column="13" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#561#562#0" expanded="true" />
@@ -1250,8 +1207,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/operations/ThroughputJSON.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.17720531">
-          <caret line="107" column="9" selection-start-line="107" selection-start-column="9" selection-end-line="107" selection-end-column="9" />
+        <state vertical-scroll-proportion="0.21832061">
+          <caret line="77" column="16" selection-start-line="77" selection-start-column="16" selection-end-line="77" selection-end-column="16" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

@@ -2,15 +2,11 @@ package model;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.UUID;
 import java.time.*;
 
 /** Stores the values for Applications and environment */
 public class HistoryEntry {
-    public static  Timestamp createNullTimestamp() {
-        return new Timestamp(System.currentTimeMillis());
-    }
 
     private UUID uuid;
     private Instant retrieved;

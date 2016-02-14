@@ -4,6 +4,7 @@ import db.DBConnection;
 import model.ThroughputEntry;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.time.*;
@@ -21,23 +22,28 @@ public class ThroughputJSON {
     private Connection connection;
     private DBConnection dbWork;
     private String json;
-    private ZoneId zoneId = ZoneId.of("Europe/Dublin");
-    private Map<Long, BigDecimal> map = new LinkedHashMap<>();
+    private ZoneId zoneId;
+    private Map<Long, BigDecimal> map;
     private long entryDay;
+    private long newDayCheck;
+    private long dayCount;
     private BigDecimal valueForDate;
+    private BigDecimal newTotalForDate;
 
     public ThroughputJSON(String sDate, String eDate, String env, String app, Connection connection, DBConnection dbWork) {
 
         this.sDate = sDate;
         this.eDate = eDate;
+        this.from = TimestampUtils.parseTimestamp(sDate, null);
+        this.to = TimestampUtils.parseTimestamp(eDate, null);
         this.env = env;
         this.app = app;
         this.connection = connection;
         this.dbWork = dbWork;
         this.json = "[";
-        this.from = TimestampUtils.parseTimestamp(sDate, null);
-        this.to = TimestampUtils.parseTimestamp(eDate, null);
-
+        this.zoneId = ZoneId.of("Europe/Dublin");
+        this.map = new LinkedHashMap<>();
+        this.dayCount = 0;
     }
 
     public String Generate(String type) {
@@ -63,24 +69,25 @@ public class ThroughputJSON {
             assert throughPutList != null;
             for (ThroughputEntry chartModel : throughPutList) {
 
+                // Convert the epochSecond value of the period pulled for the DB to it's day for insertion into a Map
                 ZonedDateTime zdt = ZonedDateTime.ofInstant(chartModel.getRetrieved(), zoneId);
                 LocalDate localDate = zdt.toLocalDate();
                 entryDay = localDate.atStartOfDay(zoneId).toEpochSecond() * TimestampUtils.MILLIS_PER_SECOND;
                 valueForDate = map.get(entryDay);
 
-                if (Objects.equals(type, "totalChart")) {
+                if (Objects.equals(type, "total")) {
 
                     Total(chartModel);
 
-                } else if (Objects.equals(type, "maxChart")) {
+                } else if (Objects.equals(type, "max")) {
 
                     Max(chartModel);
 
-                } else if (Objects.equals(type, "minChart")) {
+                } else if (Objects.equals(type, "min")) {
 
                     Min(chartModel);
 
-                } else if (Objects.equals(type, "meanChart")) {
+                } else if (Objects.equals(type, "mean")) {
 
                     Mean(chartModel);
 
@@ -117,20 +124,22 @@ public class ThroughputJSON {
 
     public void Total(ThroughputEntry chartModel) {
 
-        BigDecimal newTotalForDate = (null == valueForDate) ? BigDecimal.valueOf(chartModel.getThroughput()) :
+        newTotalForDate = (null == valueForDate) ? BigDecimal.valueOf(chartModel.getThroughput()) :
                 valueForDate.add(BigDecimal.valueOf(chartModel.getThroughput()));
 
         if (null == newTotalForDate) {  // If we failed to get new value.
             // TODO: Handle error condition.
         } else {  // Else normal, we have a new total. Store it in map.
 
-            map.put(entryDay, newTotalForDate);  // Replaces any old value.
+            map.put(entryDay, newTotalForDate);  // Replaces any old value.s
         }
     }
 
     public void Max(ThroughputEntry chartModel) {
 
-        BigDecimal newMaxForDate = (null == this.valueForDate) ? BigDecimal.valueOf(chartModel.getThroughput()) :
+        // Check if the valueForDate has been set yet, if no, set it with the value pulled from the db,
+        // if yes compare the value with the new value pulled for the DB to see which one is bigger, set the newMaxForDate
+        BigDecimal newMaxForDate = (null == valueForDate) ? BigDecimal.valueOf(chartModel.getThroughput()) :
                 (valueForDate.compareTo(BigDecimal.valueOf(chartModel.getThroughput())) == 1) ?
                         valueForDate : BigDecimal.valueOf(chartModel.getThroughput());
 
@@ -144,20 +153,47 @@ public class ThroughputJSON {
 
     public void Min(ThroughputEntry chartModel) {
 
-        BigDecimal newMaxForDate = (null == this.valueForDate) ? BigDecimal.valueOf(chartModel.getThroughput()) :
+        // Check if the valueForDate has been set yet, if no, set it with the value pulled from the db,
+        // if yes compare the value with the new value pulled for the DB to see which one is smaller, set the newMinForDate
+        BigDecimal newMinForDate = (null == valueForDate) ? BigDecimal.valueOf(chartModel.getThroughput()) :
                 (valueForDate.compareTo(BigDecimal.valueOf(chartModel.getThroughput())) == -1) ?
                         valueForDate : BigDecimal.valueOf(chartModel.getThroughput());
 
-        if (null == newMaxForDate) {  // If we failed to get new value.
+        if (null == newMinForDate) {  // If we failed to get new value.
             // TODO: Handle error condition.
         } else {  // Else normal, we have a new max. Store it in map.
 
-            map.put(entryDay, newMaxForDate);  // Replaces any old value.
+            map.put(entryDay, newMinForDate);  // Replaces any old value.
         }
     }
 
     public void Mean(ThroughputEntry chartModel) {
 
+        // Check if the newDayCheck var has been set, if not set it to the current entryDay
+        if (newDayCheck == 0) {
+            newDayCheck = entryDay;
+        }
+        // Check if the current entryDay and newDayCheck var's match,
+        // if no, we have a new entryDay and need to calc the average of the old entryDay and insert into the map
+        // Set the dayCount = 0 and newTotalForDate = 0
+        if (entryDay != newDayCheck) {
+            newTotalForDate = newTotalForDate.divide(BigDecimal.valueOf(dayCount), 3, RoundingMode.CEILING);
+            map.put(newDayCheck, newTotalForDate);
+            System.out.println("Day " + newDayCheck + "day Count" + dayCount + "Value: " + newTotalForDate);
+            dayCount = 0;
+            newTotalForDate = new BigDecimal(0);
+        }
 
+        newTotalForDate = (null == valueForDate) ? BigDecimal.valueOf(chartModel.getThroughput()) :
+                valueForDate.add(BigDecimal.valueOf(chartModel.getThroughput()));
+
+        if (null == newTotalForDate) {  // If we failed to get new value.
+            // TODO: Handle error condition.
+        } else {  // Else normal, we have a new total. Store it in map.
+
+            dayCount++;
+            newDayCheck = entryDay;
+            map.put(entryDay, newTotalForDate);  // Replaces any old value.s
+        }
     }
 }

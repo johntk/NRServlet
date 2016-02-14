@@ -36,14 +36,16 @@ public class PreProcessor extends HttpServlet {
         String eDate = request.getParameter("end");
         String env = request.getParameter("env");
         String app = request.getParameter("app");
+        String type = request.getParameter("type");
         System.out.println("Env: " + env);
         System.out.println("App : " + app);
         System.out.println("Start Date : " + sDate);
         System.out.println("End Date : " + eDate);
+        System.out.println("End Date : " + type);
         try (Connection connection = dbWork.getConnection()) {
 
             ThroughputJSON chart = new ThroughputJSON(sDate, eDate, env, app, connection, dbWork);
-            String json = chart.Generate("minChart");
+            String json = chart.Generate(type);
             System.out.println("json : " + json);
             response.getWriter().write(json);
 
