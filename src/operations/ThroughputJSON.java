@@ -17,6 +17,8 @@ public class ThroughputJSON {
     private String eDate;
     private Timestamp from;
     private Timestamp to;
+    private String start;
+    private String end;
     private String env;
     private String app;
     private Connection connection;
@@ -40,10 +42,13 @@ public class ThroughputJSON {
         this.app = app;
         this.connection = connection;
         this.dbWork = dbWork;
-        this.json = "[";
+        this.json = "[{";
         this.zoneId = ZoneId.of("Europe/Dublin");
         this.map = new LinkedHashMap<>();
         this.dayCount = 0;
+        this.start = "\"name\": \"total\", \"data\":[[" + (from.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND + "," + null + "],");
+        this.end = "[" + (to.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND + "," + null + "]]}");
+
     }
 
     public String Generate(String type) {
@@ -58,11 +63,33 @@ public class ThroughputJSON {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            // TODO: Add an outer for loop for each calculation
+            // Loop through the throughput pulled form the DB and do the desired calculation on it
+            assert throughPutList != null;
+            int count = 1;
+            for (ThroughputEntry chartModel : throughPutList) {
 
-            // Check that are list is not null and add the starting date for our chart to the JSON string
-            if (throughPutList != null) {
+                // Convert the epochSecond value of the period pulled for the DB to it's day for insertion into a Map
+                ZonedDateTime zdt = ZonedDateTime.ofInstant(chartModel.getRetrieved(), zoneId);
+                LocalDate localDate = zdt.toLocalDate();
+                entryDay = localDate.atStartOfDay(zoneId).toEpochSecond() * TimestampUtils.MILLIS_PER_SECOND;
+                valueForDate = map.get(entryDay);
 
-                json += "[" + (from.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND + "," + null + "],");
+                if (count == 1) {
+                    json += "\"name\": \"total\", \"data\":[[" + (from.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND + "," + null + "],");
+                }
+                Total(chartModel);
+                if (count == throughPutList.size()) {
+
+                    for (Map.Entry<Long, BigDecimal> entry : map.entrySet()) {
+
+                        json += "[" + (entry.getKey() + "," + entry.getValue() + "],");
+                    }
+                    json += end;
+                    map.clear();
+                    count =0;
+                }
+                count++;
             }
 
             // Loop through the throughput pulled form the DB and do the desired calculation on it
@@ -75,43 +102,28 @@ public class ThroughputJSON {
                 entryDay = localDate.atStartOfDay(zoneId).toEpochSecond() * TimestampUtils.MILLIS_PER_SECOND;
                 valueForDate = map.get(entryDay);
 
-                if (Objects.equals(type, "total")) {
-
-                    Total(chartModel);
-
-                } else if (Objects.equals(type, "max")) {
-
-                    Max(chartModel);
-
-                } else if (Objects.equals(type, "min")) {
-
-                    Min(chartModel);
-
-                } else if (Objects.equals(type, "mean")) {
-
-                    Mean(chartModel);
-
-                } else {
-
-                    Default(chartModel);
+                if (count == 1) {
+                    json += ",{" + "\"name\": \"default\", \"data\":[[" + (from.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND + "," + null + "],");
                 }
+                Default(chartModel);
+                if (count == throughPutList.size()) {
+
+                    for (Map.Entry<Long, BigDecimal> entry : map.entrySet()) {
+
+                        json += "[" + (entry.getKey() + "," + entry.getValue() + "],");
+                    }
+                    json += end+ "]";
+                    map.clear();
+                    count =0;
+                }
+                count++;
             }
 
-            for (Map.Entry<Long, BigDecimal> entry : map.entrySet()) {
-
-                json += "[" + (entry.getKey() + "," + entry.getValue() + "],");
-            }
-
-            if (throughPutList != null) {
-                json += "[" + (to.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND + "," + null + "]");
-                json += "]";
-            }
             if (throughPutList == null) {
                 json = "No record found";
             }
         } else {
             json = "Date must be selected." + "App : " + app + " " + eDate;
-
         }
         return json;
     }
