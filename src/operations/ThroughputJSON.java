@@ -42,11 +42,11 @@ public class ThroughputJSON {
         this.app = app;
         this.connection = connection;
         this.dbWork = dbWork;
-        this.json = "[{";
+        this.json = "[";
         this.zoneId = ZoneId.of("Europe/Dublin");
         this.map = new LinkedHashMap<>();
         this.dayCount = 0;
-        this.start = "\"name\": \"total\", \"data\":[[" + (from.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND + "," + null + "],");
+//        this.start = "\"name\": \"total\", \"data\":[[" + (from.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND + "," + null + "],");
         this.end = "[" + (to.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND + "," + null + "]]}");
 
     }
@@ -64,60 +64,88 @@ public class ThroughputJSON {
                 e.printStackTrace();
             }
             // TODO: Add an outer for loop for each calculation
-            // Loop through the throughput pulled form the DB and do the desired calculation on it
+
+            String[] calculations = new String[]{"default", "total", "min", "max", "mean", "extrapo"};
+
             assert throughPutList != null;
             int count = 1;
-            for (ThroughputEntry chartModel : throughPutList) {
+            int meanCount =0;
+            for (String calc : calculations) {
+                for (ThroughputEntry chartModel : throughPutList) {
 
-                // Convert the epochSecond value of the period pulled for the DB to it's day for insertion into a Map
-                ZonedDateTime zdt = ZonedDateTime.ofInstant(chartModel.getRetrieved(), zoneId);
-                LocalDate localDate = zdt.toLocalDate();
-                entryDay = localDate.atStartOfDay(zoneId).toEpochSecond() * TimestampUtils.MILLIS_PER_SECOND;
-                valueForDate = map.get(entryDay);
+                    // Convert the epochSecond value of the period pulled for the DB to it's day for insertion into a Map
+                    ZonedDateTime zdt = ZonedDateTime.ofInstant(chartModel.getRetrieved(), zoneId);
+                    LocalDate localDate = zdt.toLocalDate();
+                    entryDay = localDate.atStartOfDay(zoneId).toEpochSecond() * TimestampUtils.MILLIS_PER_SECOND;
+                    valueForDate = map.get(entryDay);
 
-                if (count == 1) {
-                    json += "\"name\": \"total\", \"data\":[[" + (from.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND + "," + null + "],");
-                }
-                Total(chartModel);
-                if (count == throughPutList.size()) {
-
-                    for (Map.Entry<Long, BigDecimal> entry : map.entrySet()) {
-
-                        json += "[" + (entry.getKey() + "," + entry.getValue() + "],");
+                    if (count == 1) {
+                        json += "{\"name\": \"" + calc + "\", \"data\":[[" + (from.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND + "," + null + "],");
                     }
-                    json += end;
-                    map.clear();
-                    count =0;
+                    if (calc.equals("default")) {
+                        Default(chartModel);
+                    } else if (calc.equals("total")) {
+                        Total(chartModel);
+                    } else if (calc.equals("min")) {
+                        Min(chartModel);
+                    } else if (calc.equals("max")) {
+                        Max(chartModel);
+                    } else if (calc.equals("mean")) {
+                        meanCount++;
+                        if(meanCount == throughPutList.size()){
+                            entryDay =0;
+                        }
+                        Mean(chartModel);
+                    }
+                    if (count == throughPutList.size()) {
+
+                        for (Map.Entry<Long, BigDecimal> entry : map.entrySet()) {
+
+                            json += "[" + (entry.getKey() + "," + entry.getValue() + "],");
+                        }
+                        if(calc != "extrapo"){
+                            json += end + ",";
+                        }
+                        else{
+                            json += end;
+                        }
+
+                        map.clear();
+                        count = 0;
+                    }
+                    count++;
                 }
-                count++;
             }
+            json += "]";
+            // Loop through the throughput pulled form the DB and do the desired calculation on it
+
 
             // Loop through the throughput pulled form the DB and do the desired calculation on it
-            assert throughPutList != null;
-            for (ThroughputEntry chartModel : throughPutList) {
-
-                // Convert the epochSecond value of the period pulled for the DB to it's day for insertion into a Map
-                ZonedDateTime zdt = ZonedDateTime.ofInstant(chartModel.getRetrieved(), zoneId);
-                LocalDate localDate = zdt.toLocalDate();
-                entryDay = localDate.atStartOfDay(zoneId).toEpochSecond() * TimestampUtils.MILLIS_PER_SECOND;
-                valueForDate = map.get(entryDay);
-
-                if (count == 1) {
-                    json += ",{" + "\"name\": \"default\", \"data\":[[" + (from.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND + "," + null + "],");
-                }
-                Default(chartModel);
-                if (count == throughPutList.size()) {
-
-                    for (Map.Entry<Long, BigDecimal> entry : map.entrySet()) {
-
-                        json += "[" + (entry.getKey() + "," + entry.getValue() + "],");
-                    }
-                    json += end+ "]";
-                    map.clear();
-                    count =0;
-                }
-                count++;
-            }
+//            assert throughPutList != null;
+//            for (ThroughputEntry chartModel : throughPutList) {
+//
+//                // Convert the epochSecond value of the period pulled for the DB to it's day for insertion into a Map
+//                ZonedDateTime zdt = ZonedDateTime.ofInstant(chartModel.getRetrieved(), zoneId);
+//                LocalDate localDate = zdt.toLocalDate();
+//                entryDay = localDate.atStartOfDay(zoneId).toEpochSecond() * TimestampUtils.MILLIS_PER_SECOND;
+//                valueForDate = map.get(entryDay);
+//
+//                if (count == 1) {
+//                    json += ",{" + "\"name\": \"default\", \"data\":[[" + (from.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND + "," + null + "],");
+//                }
+//                Default(chartModel);
+//                if (count == throughPutList.size()) {
+//
+//                    for (Map.Entry<Long, BigDecimal> entry : map.entrySet()) {
+//
+//                        json += "[" + (entry.getKey() + "," + entry.getValue() + "],");
+//                    }
+//                    json += end + "]";
+//                    map.clear();
+//                    count = 0;
+//                }
+//                count++;
+//            }
 
             if (throughPutList == null) {
                 json = "No record found";
@@ -196,6 +224,9 @@ public class ThroughputJSON {
             newTotalForDate = new BigDecimal(0);
         }
 
+        if(entryDay!= 0){
+
+
         newTotalForDate = (null == valueForDate) ? BigDecimal.valueOf(chartModel.getThroughput()) :
                 valueForDate.add(BigDecimal.valueOf(chartModel.getThroughput()));
 
@@ -207,5 +238,6 @@ public class ThroughputJSON {
             newDayCheck = entryDay;
             map.put(entryDay, newTotalForDate);  // Replaces any old value.s
         }
+    }
     }
 }
