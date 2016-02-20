@@ -9,8 +9,8 @@ import java.util.List;
 public class DBConnection {
 
     private final String table;
-    private static final String user = "CLOUD";
-    private static final String password = "Dormant-2000";
+    private static final String user = "johntk";
+    private static final String password = "IBMdb2";
     private static final String DB2url = "jdbc:db2://192.168.1.2:50000/NEWRELIC";
 
 

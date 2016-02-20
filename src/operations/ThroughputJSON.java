@@ -63,13 +63,12 @@ public class ThroughputJSON {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            // TODO: Add an outer for loop for each calculation
 
             String[] calculations = new String[]{"default", "total", "min", "max", "mean", "extrapo"};
 
             assert throughPutList != null;
             int count = 1;
-            int meanCount =0;
+            int meanCount = 0;
             for (String calc : calculations) {
                 for (ThroughputEntry chartModel : throughPutList) {
 
@@ -92,9 +91,11 @@ public class ThroughputJSON {
                         Max(chartModel);
                     } else if (calc.equals("mean")) {
                         meanCount++;
-                        if(meanCount == throughPutList.size()){
-                            entryDay =0;
+                        if (meanCount == throughPutList.size()) {
+                            entryDay = 0;
+
                         }
+
                         Mean(chartModel);
                     }
                     if (count == throughPutList.size()) {
@@ -103,11 +104,23 @@ public class ThroughputJSON {
 
                             json += "[" + (entry.getKey() + "," + entry.getValue() + "],");
                         }
-                        if(calc != "extrapo"){
-                            json += end + ",";
-                        }
-                        else{
-                            json += end;
+                        if (calc != "extrapo") {
+
+                            if(newDayCheck > to.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND){
+                                json +=  "]},";
+                            }
+                            else{
+                                json += end + ",";
+                            }
+
+                        } else {
+                            System.out.println("Newdaycheck : " + newDayCheck + " To " + to.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND);
+                            if(newDayCheck > to.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND){
+                                json +=  "]}";
+                            }
+                            else{
+                                json += end;
+                            }
                         }
 
                         map.clear();
@@ -117,35 +130,6 @@ public class ThroughputJSON {
                 }
             }
             json += "]";
-            // Loop through the throughput pulled form the DB and do the desired calculation on it
-
-
-            // Loop through the throughput pulled form the DB and do the desired calculation on it
-//            assert throughPutList != null;
-//            for (ThroughputEntry chartModel : throughPutList) {
-//
-//                // Convert the epochSecond value of the period pulled for the DB to it's day for insertion into a Map
-//                ZonedDateTime zdt = ZonedDateTime.ofInstant(chartModel.getRetrieved(), zoneId);
-//                LocalDate localDate = zdt.toLocalDate();
-//                entryDay = localDate.atStartOfDay(zoneId).toEpochSecond() * TimestampUtils.MILLIS_PER_SECOND;
-//                valueForDate = map.get(entryDay);
-//
-//                if (count == 1) {
-//                    json += ",{" + "\"name\": \"default\", \"data\":[[" + (from.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND + "," + null + "],");
-//                }
-//                Default(chartModel);
-//                if (count == throughPutList.size()) {
-//
-//                    for (Map.Entry<Long, BigDecimal> entry : map.entrySet()) {
-//
-//                        json += "[" + (entry.getKey() + "," + entry.getValue() + "],");
-//                    }
-//                    json += end + "]";
-//                    map.clear();
-//                    count = 0;
-//                }
-//                count++;
-//            }
 
             if (throughPutList == null) {
                 json = "No record found";
@@ -224,20 +208,19 @@ public class ThroughputJSON {
             newTotalForDate = new BigDecimal(0);
         }
 
-        if(entryDay!= 0){
+        if (entryDay != 0) {
 
+            newTotalForDate = (null == valueForDate) ? BigDecimal.valueOf(chartModel.getThroughput()) :
+                    valueForDate.add(BigDecimal.valueOf(chartModel.getThroughput()));
 
-        newTotalForDate = (null == valueForDate) ? BigDecimal.valueOf(chartModel.getThroughput()) :
-                valueForDate.add(BigDecimal.valueOf(chartModel.getThroughput()));
+            if (null == newTotalForDate) {  // If we failed to get new value.
+                // TODO: Handle error condition.
+            } else {  // Else normal, we have a new total. Store it in map.
 
-        if (null == newTotalForDate) {  // If we failed to get new value.
-            // TODO: Handle error condition.
-        } else {  // Else normal, we have a new total. Store it in map.
-
-            dayCount++;
-            newDayCheck = entryDay;
-            map.put(entryDay, newTotalForDate);  // Replaces any old value.s
+                dayCount++;
+                newDayCheck = entryDay;
+                map.put(entryDay, newTotalForDate);  // Replaces any old value.s
+            }
         }
-    }
     }
 }
