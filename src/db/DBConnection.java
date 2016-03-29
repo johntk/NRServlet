@@ -46,9 +46,7 @@ public class DBConnection {
         Statement statement = connection.createStatement();
 
         if (statement.execute("SELECT * FROM " + table + " WHERE " +
-                "ENVIRONMENT = '" + env + "'" +
-                " AND APPNAME = '" + app + "'"+
-                " AND RETRIEVED >= '" + firstPeriod + "'" +
+                "RETRIEVED >= '" + firstPeriod + "'" +
                 " AND PERIOD_END <= '" + lastPeriod + "'")) {
             while (statement.getResultSet().next()) {
                 entries.add(new ThroughputEntry(statement.getResultSet()));
@@ -60,4 +58,34 @@ public class DBConnection {
 
         return entries;
     }
+    public List<String> getEnvironments(Connection connection) throws Exception {
+        List<String> results = new ArrayList<>();
+
+        Statement statement = connection.createStatement();
+
+        if (statement
+                .execute("SELECT ENVIRONMENT FROM " + table + " GROUP BY ENVIRONMENT")) {
+            while (statement.getResultSet().next()) {
+                results.add(statement.getResultSet().getString("ENVIRONMENT"));
+            }
+        }
+
+        return results;
+    }
+
+    public List<String> getApplications(Connection connection) throws Exception {
+        List<String> results = new ArrayList<>();
+
+        Statement statement = connection.createStatement();
+
+        if (statement
+                .execute("SELECT APPNAME FROM " + table + " GROUP BY APPNAME")) {
+            while (statement.getResultSet().next()) {
+                results.add(statement.getResultSet().getString("APPNAME"));
+            }
+        }
+
+        return results;
+    }
+
 }

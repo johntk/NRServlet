@@ -2,6 +2,8 @@ package operations;
 
 import db.DBConnection;
 import model.ThroughputEntry;
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -31,6 +33,7 @@ public class ThroughputJSON {
     private long dayCount;
     private BigDecimal valueForDate;
     private BigDecimal newTotalForDate;
+    private List<String> envList;
 
     public ThroughputJSON(String sDate, String eDate, String env, String app, Connection connection, DBConnection dbWork) {
 
@@ -45,9 +48,12 @@ public class ThroughputJSON {
         this.json = "[";
         this.zoneId = ZoneId.of("Europe/Dublin");
         this.map = new LinkedHashMap<>();
+        this.envList = new ArrayList<>();
         this.dayCount = 0;
 //        this.start = "\"name\": \"total\", \"data\":[[" + (from.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND + "," + null + "],");
         this.end = "[" + (to.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND + "," + null + "]]}");
+
+
 
     }
 
@@ -114,7 +120,7 @@ public class ThroughputJSON {
                             }
 
                         } else {
-                            System.out.println("Newdaycheck : " + newDayCheck + " To " + to.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND);
+//                            System.out.println("Newdaycheck : " + newDayCheck + " To " + to.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND);
                             if(newDayCheck > to.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND){
                                 json +=  "]}";
                             }
@@ -129,7 +135,7 @@ public class ThroughputJSON {
                     count++;
                 }
             }
-            json += "]";
+//            json += "]";
 
             if (throughPutList == null) {
                 json = "No record found";
@@ -203,7 +209,7 @@ public class ThroughputJSON {
         if (entryDay != newDayCheck) {
             newTotalForDate = newTotalForDate.divide(BigDecimal.valueOf(dayCount), 3, RoundingMode.CEILING);
             map.put(newDayCheck, newTotalForDate);
-            System.out.println("Day " + newDayCheck + "day Count" + dayCount + "Value: " + newTotalForDate);
+//            System.out.println("Day " + newDayCheck + "day Count" + dayCount + "Value: " + newTotalForDate);
             dayCount = 0;
             newTotalForDate = new BigDecimal(0);
         }
