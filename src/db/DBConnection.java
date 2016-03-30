@@ -39,25 +39,6 @@ public class DBConnection {
         return connection;
     }
 
-
-    public List<ThroughputEntry> getThroughputEntriesInTimespan(String env, String app, Timestamp firstPeriod, Timestamp lastPeriod, Connection connection) throws Exception {
-        List<ThroughputEntry> entries = new ArrayList<>();
-
-        Statement statement = connection.createStatement();
-
-        if (statement.execute("SELECT * FROM " + table + " WHERE " +
-                "RETRIEVED >= '" + firstPeriod + "'" +
-                " AND PERIOD_END <= '" + lastPeriod + "'")) {
-            while (statement.getResultSet().next()) {
-                entries.add(new ThroughputEntry(statement.getResultSet()));
-
-            }
-        } else {
-            return null;
-        }
-
-        return entries;
-    }
     public List<String> getEnvironments(Connection connection) throws Exception {
         List<String> results = new ArrayList<>();
 
@@ -88,4 +69,24 @@ public class DBConnection {
         return results;
     }
 
+    public List<ThroughputEntry> getThroughputEntriesInTimespan(String env, String app, Timestamp firstPeriod, Timestamp lastPeriod, Connection connection) throws Exception {
+        List<ThroughputEntry> entries = new ArrayList<>();
+
+        Statement statement = connection.createStatement();
+
+        if (statement.execute("SELECT * FROM " + table + " WHERE " +
+                "ENVIRONMENT = '" + env + "'" +
+                " AND APPNAME = '" + app + "'" +
+                " AND RETRIEVED >= '" + firstPeriod + "'" +
+                " AND PERIOD_END <= '" + lastPeriod + "'")) {
+            while (statement.getResultSet().next()) {
+                entries.add(new ThroughputEntry(statement.getResultSet()));
+
+            }
+        } else {
+            return null;
+        }
+
+        return entries;
+    }
 }

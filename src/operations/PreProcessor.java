@@ -3,7 +3,6 @@ package operations;
 import db.DBConnection;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -38,28 +37,27 @@ public class PreProcessor extends HttpServlet {
         dbWork  = DBConnection.createApplication();
         List<String> envChartList = new ArrayList<>();
         List<String> appChartList = new ArrayList<>();
-
-        String json = "";
+        String json = "[";
         String sDate = request.getParameter("start");
         String eDate = request.getParameter("end");
         String env = request.getParameter("env");
         String app = request.getParameter("app");
-        String type = request.getParameter("type");
+        String type = request.getParameter("arg");
         JSONArray envAppList = new JSONArray();
+        System.out.println("Env: " + env);
+        System.out.println("App : " + app);
+        System.out.println("Start Date : " + sDate);
+        System.out.println("End Date : " + eDate);
+        System.out.println("End Date : " + type);
         try (Connection connection = dbWork.getConnection()) {
-
-            if(type.equals("list")){
-                List<String> envList =  dbWork.getEnvironments(connection);
+            if(type.equals("list")) {
+                List<String> envList = dbWork.getEnvironments(connection);
                 envList.forEach(envAppList::put);
                 envAppList.put("END");
-                List<String> appList =  dbWork.getApplications(connection);
+                List<String> appList = dbWork.getApplications(connection);
                 appList.forEach(envAppList::put);
                 response.getWriter().write(String.valueOf(envAppList));
-            }else{
-                System.out.println("Env: " + env);
-                System.out.println("App : " + app);
-                System.out.println("Start Date : " + sDate);
-                System.out.println("End Date : " + eDate);
+            }else {
 
                 try {
                     JSONArray envArray = new JSONArray(env);
@@ -74,23 +72,29 @@ public class PreProcessor extends HttpServlet {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+
                 int count =0;
                 int num = (envChartList.size() * appChartList.size());
+
                 for(String environment: envChartList){
                     for(String application: appChartList){
                         ThroughputJSON chart = new ThroughputJSON(sDate, eDate, environment, application, connection, dbWork);
+
                         json += chart.Generate(type);
                         if(count != num -1){
                             json += ",";
                         }
                         count++;
-                        System.out.println("Count : " + count + " Size :" + envChartList.size() * appChartList.size());
                     }
                 }
-
+                json += "]";
                 System.out.println("json : " + json);
                 response.getWriter().write(json);
             }
+
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | SQLException e) {
+            e.printStackTrace();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
