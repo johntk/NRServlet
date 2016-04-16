@@ -13,7 +13,6 @@ public class DBConnection {
     private static final String password = "IBMdb2";
     private static final String DB2url = "jdbc:db2://192.168.1.2:50000/NEWRELIC";
 
-
     /** Set the table name for applications */
     public  static DBConnection createApplication() {
         return new DBConnection("APPLICATIONDATA");

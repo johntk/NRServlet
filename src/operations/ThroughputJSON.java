@@ -10,6 +10,11 @@ import java.sql.Timestamp;
 import java.time.*;
 import java.util.*;
 
+import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
+import org.apache.commons.math3.analysis.polynomials.PolynomialFunction;
+import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
+import org.joda.time.DateTime;
+
 public class ThroughputJSON {
 
     List<ThroughputEntry> throughPutList;
@@ -17,7 +22,6 @@ public class ThroughputJSON {
     private String eDate;
     private Timestamp from;
     private Timestamp to;
-    private String start;
     private String end;
     private String env;
     private String app;
@@ -29,10 +33,16 @@ public class ThroughputJSON {
     private long entryDay;
     private long newDayCheck;
     private long dayCount;
+    private int count;
+    private int throughCount;
     private BigDecimal valueForDate;
     private BigDecimal newTotalForDate;
+    private List<Double> time;
+    private List<Double> throughput;
+    private double secCount;
+    private List<String> calcList;
 
-    public ThroughputJSON(String sDate, String eDate, String env, String app, Connection connection, DBConnection dbWork) {
+    public ThroughputJSON(String sDate, String eDate, String env, String app, Connection connection, DBConnection dbWork, ArrayList calcList) {
 
         this.sDate = sDate;
         this.eDate = eDate;
@@ -46,9 +56,13 @@ public class ThroughputJSON {
         this.zoneId = ZoneId.of("Europe/Dublin");
         this.map = new LinkedHashMap<>();
         this.dayCount = 0;
-//        this.start = "\"name\": \"total\", \"data\":[[" + (from.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND + "," + null + "],");
+        this.count = 0;
+        this.throughCount =0;
         this.end = "[" + (to.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND + "," + null + "]]}");
-
+        this.time = new ArrayList<>();
+        this.throughput = new ArrayList<>();
+        this.secCount =0;
+        this.calcList = calcList;
     }
 
     public String Generate(String type) {
@@ -59,17 +73,18 @@ public class ThroughputJSON {
             // Pull data from DB
             try {
                 throughPutList = dbWork.getThroughputEntriesInTimespan(env, app, from, to, connection);
-                System.out.println(throughPutList.size());
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-            String[] calculations = new String[]{"default", "total", "min", "max", "mean", "extrapo"};
+            for (String calc : calcList) {
+                System.out.println(calc);
+            }
 
             assert throughPutList != null;
             int count = 1;
             int meanCount = 0;
-            for (String calc : calculations) {
+            for (String calc : calcList) {
                 for (ThroughputEntry chartModel : throughPutList) {
 
                     // Convert the epochSecond value of the period pulled for the DB to it's day for insertion into a Map
@@ -79,9 +94,9 @@ public class ThroughputJSON {
                     valueForDate = map.get(entryDay);
 
                     if (count == 1) {
-                        json += "{\"name\": \"" + env +"-" + app +"-" + calc + "\", \"data\":[[" + (from.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND + "," + null + "],");
+                        json += "{\"name\": \"" + env + "-" + app + "-" + calc + "\", \"data\":[[" + (from.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND + "," + null + "],");
                     }
-                    if (calc.equals("default")) {
+                    if (calc.equals("throughput")) {
                         Default(chartModel);
                     } else if (calc.equals("total")) {
                         Total(chartModel);
@@ -93,10 +108,11 @@ public class ThroughputJSON {
                         meanCount++;
                         if (meanCount == throughPutList.size()) {
                             entryDay = 0;
-
                         }
-
                         Mean(chartModel);
+                    } else if (calc.equals("extrapo")) {
+
+                        Extrapolation(chartModel);
                     }
                     if (count == throughPutList.size()) {
 
@@ -104,21 +120,20 @@ public class ThroughputJSON {
 
                             json += "[" + (entry.getKey() + "," + entry.getValue() + "],");
                         }
-                        if (calc != "extrapo") {
+                        System.out.println(calc.indexOf(calc) + " " + (calcList.size() -1) );
+                        if (calcList.indexOf(calc) != (calcList.size() -1)) {
 
-                            if(newDayCheck > to.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND){
-                                json +=  "]},";
-                            }
-                            else{
+                            if (newDayCheck > to.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND) {
+                                json += "]},";
+                            } else {
                                 json += end + ",";
                             }
 
                         } else {
-                            System.out.println("Newdaycheck : " + newDayCheck + " To " + to.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND);
-                            if(newDayCheck > to.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND){
-                                json +=  "]}";
-                            }
-                            else{
+//                            System.out.println("Newdaycheck : " + newDayCheck + " To " + to.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND);
+                            if (newDayCheck > to.toInstant().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND) {
+                                json += "]}";
+                            } else {
                                 json += end;
                             }
                         }
@@ -203,7 +218,7 @@ public class ThroughputJSON {
         if (entryDay != newDayCheck) {
             newTotalForDate = newTotalForDate.divide(BigDecimal.valueOf(dayCount), 3, RoundingMode.CEILING);
             map.put(newDayCheck, newTotalForDate);
-            System.out.println("Day " + newDayCheck + "day Count" + dayCount + "Value: " + newTotalForDate);
+//            System.out.println("Day " + newDayCheck + "day Count" + dayCount + "Value: " + newTotalForDate);
             dayCount = 0;
             newTotalForDate = new BigDecimal(0);
         }
@@ -222,5 +237,106 @@ public class ThroughputJSON {
                 map.put(entryDay, newTotalForDate);  // Replaces any old value.s
             }
         }
+    }
+
+    public void Extrapolation(ThroughputEntry chartModel) {
+
+//        double minute = (double)  chartModel.getRetrieved().getEpochSecond();
+        double minute = secCount;
+        secCount+=1;
+
+        if (count == 0) {
+            time.add(minute);
+            throughput.add(chartModel.getThroughput());
+            count++;
+        } else {
+            if (minute > time.get(count -1)) {
+//                System.out.println("Through " + chartModel.getThroughput());
+                time.add(minute);
+                throughput.add(chartModel.getThroughput());
+                count++;
+            }
+        }
+        //        System.out.println("Min " + minute);
+        //        System.out.println("Through " + chartModel.getThroughput());
+        throughCount++;
+/**
+ * Run interpolateLinear once add returned value to data set, run interpolateLinear agin to see if the value fluctuates
+ * Need to resize minArray & throughArray, possibly right function to achive this
+ */
+        if (throughCount == throughPutList.size()) {
+            System.out.println( count + " Minute  " +minute);
+            count =0;
+            double [] minArray = new double[time.size()];
+            double [] throughArray = new double[throughput.size()];
+            double [] extrapArray = new double [1];
+//            Instant timer = Instant.now();
+            extrapArray[0] = time.get(time.size() -1) + 1;
+//            extrapArray[1] = time.get(time.size() -1) + 2;
+//            extrapArray[2] = time.get(time.size() -1) + 3;
+//            extrapArray[3] = time.get(time.size() -1) + 4;
+//            extrapArray[4] = time.get(time.size() -1) + 5;
+//            extrapArray[5] = time.get(time.size() -1) + 6;
+//            extrapArray[6] = time.get(time.size() -1) + 7;
+//            extrapArray[7] = time.get(time.size() -1) + 8;
+
+            for(Double min : time){
+                minArray[count] = min;
+                count++;
+            }
+            count =0;
+            for(Double through : throughput){
+                throughArray[count] = through;
+                count++;
+            }
+//            minArray[minArray.length -1] = extrapArray[extrapArray.length -1] + 1;
+//            throughArray[throughArray.length -1] = throughArray[throughArray.length -1];
+//            System.out.println( "Min: " +  extrapArray[extrapArray.length -1] + " " +  "Through: " +  throughArray[throughArray.length -1]);
+
+            double [] test = interpolateLinear(minArray, throughArray, extrapArray);
+
+//            minArray[minArray.length] = time.get(time.size() -1) + 1;
+//            throughArray[throughArray.length] = test[0];
+//            extrapArray[1] = time.get(time.size() -1) + 2;
+
+//            double [] test2 = linearInterp(minArray, throughArray, extrapArray);
+            for(int i =0; i < test.length; i++){
+                System.out.println("x2 (Future date value): " +extrapArray[i] + "\n" + "yi (Extrapolated value): " + test[i]);
+            }
+
+        }
+    }
+
+    public static double[] interpolateLinear(double[] x1, double[] y1, double[] x2) {
+        final PolynomialSplineFunction function = new LinearInterpolator().interpolate(x1, y1);
+
+        final PolynomialFunction[] splines = function.getPolynomials();
+        final PolynomialFunction firstFunction = splines[0];
+        final PolynomialFunction lastFunction = splines[splines.length - 1];
+
+        final double[] knots = function.getKnots();
+        final double firstKnot = knots[0];
+        final double lastKnot = knots[knots.length - 1];
+
+        double[] resultList = Arrays.stream(x2).map(aDouble -> {
+            if (aDouble > lastKnot) {
+                return lastFunction.value(aDouble - knots[knots.length - 2]);
+            } else if (aDouble < firstKnot)
+                return firstFunction.value(aDouble - knots[0]);
+            return function.value(aDouble);
+        }).toArray();
+
+        return resultList;
+    }
+
+    public double[] linearInterp(double[] x, double[] y, double[] xi) {
+        LinearInterpolator li = new LinearInterpolator(); // or other interpolator
+        PolynomialSplineFunction psf = li.interpolate(x, y);
+
+        double[] yi = new double[xi.length];
+        for (int i = 0; i < xi.length; i++) {
+            yi[i] = psf.value(xi[i]);
+        }
+        return yi;
     }
 }
