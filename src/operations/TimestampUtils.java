@@ -5,8 +5,10 @@ import org.joda.time.DateTime;
 import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import java.time.*;
 
 import java.sql.Timestamp;
+
 
 
 /** This class is used to format the joda Instants */
@@ -16,7 +18,7 @@ public final class TimestampUtils {
 
     private TimestampUtils() { }
 
-    private static final DateTimeFormatter FORMAT_TIMESTAMP = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZZ");
+    private static final DateTimeFormatter FORMAT_TIMESTAMP = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
 
     public static String format(Instant timestamp) {
         return FORMAT_TIMESTAMP.print(timestamp);
@@ -31,11 +33,13 @@ public final class TimestampUtils {
         }
 
         try {
-            return new Timestamp(new Instant(format(DateTime.parse(value).toInstant())).getMillis());
+
+            return Timestamp.valueOf(format(DateTime.parse(value).toInstant()));
         } catch (NumberFormatException e) {
             /* Fail silently */
         }
 
         return defaultValue;
     }
+
 }

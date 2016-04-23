@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,33 +44,31 @@ public class PreProcessor extends HttpServlet {
         String app = request.getParameter("app");
         String type = request.getParameter("arg");
 
+
         if(request.getParameter("throughput") != null){
-            calcList.add("throughput");
+            calcList.add("Throughput");
         }
         if(request.getParameter("min") != null){
-            calcList.add("min");
+            calcList.add("Min");
         }
         if(request.getParameter("max") != null){
-            calcList.add("max");
+            calcList.add("Max");
         }
         if(request.getParameter("mean") != null){
-            calcList.add("mean");
+            calcList.add("Mean");
         }
         if(request.getParameter("total") != null){
-            calcList.add("total");
+            calcList.add("Total");
         }
         if(request.getParameter("extrap") != null){
-            calcList.add("extrap");
+            calcList.add("Linear-Extrap");
+        }
+        if(request.getParameter("extrap2") != null){
+            calcList.add("P-Regression-Extrap");
         }
 
         JSONArray envAppList = new JSONArray();
-//        System.out.println("Throughput: " + request.getParameter("throughput"));
-//        System.out.println(calcList.size());
-//        System.out.println("Env: " + env);
-//        System.out.println("App : " + app);
-//        System.out.println("Start Date : " + sDate);
-//        System.out.println("End Date : " + eDate);
-//        System.out.println("Type : " + type);
+
         try (Connection connection = dbWork.getConnection()) {
             if(type.equals("list")) {
                 List<String> envList = dbWork.getEnvironments(connection);
@@ -81,18 +78,21 @@ public class PreProcessor extends HttpServlet {
                 appList.forEach(envAppList::put);
                 response.getWriter().write(String.valueOf(envAppList));
             }else {
-                try {
-                    JSONArray envArray = new JSONArray(env);
-                    for(int i = 0; i < envArray.length(); i++){
-                        envChartList.add(envArray.getString(i));
-                    }
-                    JSONArray appArry = new JSONArray(app);
-                    for(int i = 0; i < appArry.length(); i++){
-                        appChartList.add(appArry.getString(i));
-                    }
+                if(!env.equals("null")) {
+                    try {
+                        JSONArray envArray = new JSONArray(env);
+                        for (int i = 0; i < envArray.length(); i++) {
+                            envChartList.add(envArray.getString(i));
+                        }
+                        JSONArray appArry = new JSONArray(app);
+                        for (int i = 0; i < appArry.length(); i++) {
+                            appChartList.add(appArry.getString(i));
+                        }
 
-                } catch (JSONException e) {
-                    e.printStackTrace();
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 int count =0;
@@ -113,9 +113,6 @@ public class PreProcessor extends HttpServlet {
                 System.out.println("json : " + json);
                 response.getWriter().write(json);
             }
-
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | SQLException e) {
-            e.printStackTrace();
 
         } catch (Exception e) {
             e.printStackTrace();
