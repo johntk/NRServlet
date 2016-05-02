@@ -74,7 +74,7 @@ public class HistoryEntry {
         this.retrieved = retrieved;
 
         if (this.retrieved == null) {
-            this.retrieved =  Instant.now(null);
+            this.retrieved =  Instant.now();
         }
     }
 
@@ -82,7 +82,7 @@ public class HistoryEntry {
         this.periodEnd = periodEnd;
 
         if (this.periodEnd == null) {
-            this.periodEnd = Instant.now(null);
+            this.periodEnd = Instant.now();
         }
     }
 

@@ -43,28 +43,40 @@ public class PreProcessor extends HttpServlet {
         String env = request.getParameter("env");
         String app = request.getParameter("app");
         String type = request.getParameter("arg");
+        int grade =0;
+        boolean go =false;
 
 
         if(request.getParameter("throughput") != null){
             calcList.add("Throughput");
+            go=true;
         }
         if(request.getParameter("min") != null){
             calcList.add("Min");
+            go=true;
         }
         if(request.getParameter("max") != null){
             calcList.add("Max");
+            go=true;
         }
         if(request.getParameter("mean") != null){
             calcList.add("Mean");
+            go=true;
         }
         if(request.getParameter("total") != null){
             calcList.add("Total");
+            go=true;
         }
         if(request.getParameter("extrap") != null){
             calcList.add("Linear-Extrap");
+            go=true;
         }
         if(request.getParameter("extrap2") != null){
             calcList.add("P-Regression-Extrap");
+            go=true;
+        }
+        if(request.getParameter("grade") != null){
+            grade = Integer.parseInt(request.getParameter("grade"));
         }
 
         JSONArray envAppList = new JSONArray();
@@ -88,8 +100,6 @@ public class PreProcessor extends HttpServlet {
                         for (int i = 0; i < appArry.length(); i++) {
                             appChartList.add(appArry.getString(i));
                         }
-
-
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -100,11 +110,14 @@ public class PreProcessor extends HttpServlet {
 
                 for(String environment: envChartList){
                     for(String application: appChartList){
-                        ThroughputJSON chart = new ThroughputJSON(sDate, eDate, environment, application, connection, dbWork, calcList);
+                        ThroughputJSON chart = new ThroughputJSON(sDate, eDate, environment, application, connection, dbWork, calcList, grade);
 
                         json += chart.Generate(type);
                         if(count != num -1 ){
-                            json += ",";
+                            if(go) {
+                                if(!json.equals("["))
+                                json += ",";
+                            }
                         }
                         count++;
                     }

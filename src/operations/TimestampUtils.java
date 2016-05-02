@@ -5,11 +5,8 @@ import org.joda.time.DateTime;
 import org.joda.time.Instant;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import java.time.*;
 
 import java.sql.Timestamp;
-
-
 
 /** This class is used to format the joda Instants */
 public final class TimestampUtils {
@@ -41,5 +38,4 @@ public final class TimestampUtils {
 
         return defaultValue;
     }
-
 }

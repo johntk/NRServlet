@@ -10,7 +10,7 @@ public class ThroughputEntry extends HistoryEntry {
     public ThroughputEntry() {
         super();
 
-        this.setThroughput(-1.0);
+        this.setThroughput(1.0);
     }
 
     public ThroughputEntry(ThroughputEntry entry) {
