@@ -24,6 +24,7 @@ public class PreProcessorTest {
     private BigDecimal tp;
     private Instant now;
     private int addDay;
+    private BigDecimal val;
 
     // Setup the test environment
     @Before
@@ -61,8 +62,9 @@ public class PreProcessorTest {
         for(Map.Entry<Long, BigDecimal> entry: testMap.entrySet()){
              tp = entry.getValue();
         }
-        BigDecimal val = new BigDecimal("35.0");
+        val = new BigDecimal("35.0");
         assertEquals(val, tp);
+
     }
 
     // Test the Min calculation method
@@ -78,8 +80,9 @@ public class PreProcessorTest {
         for(Map.Entry<Long, BigDecimal> entry: testMap.entrySet()){
             tp = entry.getValue();
         }
-        BigDecimal val = new BigDecimal("5.0");
+        val = new BigDecimal("5.0");
         assertEquals(val, tp);
+
     }
 
     // Test the Max calculation method
@@ -95,8 +98,9 @@ public class PreProcessorTest {
         for(Map.Entry<Long, BigDecimal> entry: testMap.entrySet()){
             tp = entry.getValue();
         }
-        BigDecimal val = new BigDecimal("9.0");
+        val = new BigDecimal("9.0");
         assertEquals(val, tp);
+
     }
 
     // Test the Mean calculation method
@@ -117,7 +121,8 @@ public class PreProcessorTest {
         for(Map.Entry<Long, BigDecimal> entry: testMap.entrySet()){
             tp = entry.getValue();
         }
-        BigDecimal val = new BigDecimal("7.000");
+        val = new BigDecimal("7.000");
         assertEquals(val, tp);
+
     }
 }

@@ -18,6 +18,7 @@ import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.apache.commons.math3.analysis.polynomials.PolynomialFunction;
 import org.apache.commons.math3.analysis.polynomials.PolynomialFunctionLagrangeForm;
 import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
+import org.apache.log4j.Logger;
 
 
 public class ThroughputJSON {
@@ -50,6 +51,7 @@ public class ThroughputJSON {
     private double[] y1;
     private double[] x2;
     private int grade;
+    private static Logger logger = Logger.getLogger(ThroughputJSON.class.getName());
 
 
     public ThroughputJSON(String sDate, String eDate, String env, String app, Connection connection, DBConnection dbWork, ArrayList calcList, int grade) {
@@ -84,6 +86,7 @@ public class ThroughputJSON {
         this.count = 0;
     }
 
+    /** This is here to facilitate unit testing */
     public void Generate(ThroughputEntry chartModel){
 
         // Convert the epochSecond value of the period pulled for the DB to it's day for insertion into a Map
@@ -95,6 +98,10 @@ public class ThroughputJSON {
         if(count == 6) entryDay = 0;
     }
 
+    /** This is the main method where the user chosen calculations are run
+     * this also formats the data into a JSON string to return to highchart.js for consumption
+     * If I had more time I would investigate using a lib like GSON to format the data
+     * Also I should have used stringBuilder rather than String, but ran out of time.*/
     public String Generate(String type) {
 
         // Check that we have dates to work with
@@ -184,30 +191,33 @@ public class ThroughputJSON {
         return json;
     }
 
+    /** This is here to facilitate unit testing */
     public Map<Long, BigDecimal>  GetMap() {
 
         return map;
     }
 
+    /** This calculates the throughput value */
     public void Default(ThroughputEntry chartModel) {
 
         map.put(chartModel.getRetrieved().getEpochSecond() * TimestampUtils.MILLIS_PER_SECOND, BigDecimal.valueOf(chartModel.getThroughput()));
-
     }
 
+    /** This calculates the total throughput value per day */
     public void Total(ThroughputEntry chartModel) {
 
         newTotalForDate = (null == valueForDate) ? BigDecimal.valueOf(chartModel.getThroughput()) :
                 valueForDate.add(BigDecimal.valueOf(chartModel.getThroughput()));
 
         if (null == newTotalForDate) {  // If we failed to get new value.
-            // TODO: Handle error condition.
+            logger.fatal("Null value in Total");
         } else {  // Else normal, we have a new total. Store it in map.
 
             map.put(entryDay, newTotalForDate);  // Replaces any old value.s
         }
     }
 
+    /** This calculates the max throughput value per day */
     public void Max(ThroughputEntry chartModel) {
 
         // Check if the valueForDate has been set yet, if no, set it with the value pulled from the db,
@@ -217,13 +227,14 @@ public class ThroughputJSON {
                         valueForDate : BigDecimal.valueOf(chartModel.getThroughput());
 
         if (null == newMaxForDate) {  // If we failed to get new value.
-            // TODO: Handle error condition.
+            logger.fatal("Null value in Max");
         } else {  // Else normal, we have a new max. Store it in map.
 
             map.put(entryDay, newMaxForDate);  // Replaces any old value.
         }
     }
 
+    /** This calculates the min throughput value per day */
     public void Min(ThroughputEntry chartModel) {
 
         // Check if the valueForDate has been set yet, if no, set it with the value pulled from the db,
@@ -233,13 +244,14 @@ public class ThroughputJSON {
                         valueForDate : BigDecimal.valueOf(chartModel.getThroughput());
 
         if (null == newMinForDate) {  // If we failed to get new value.
-            // TODO: Handle error condition.
+            logger.fatal("Null value in Min");
         } else {  // Else normal, we have a new max. Store it in map.
 
             map.put(entryDay, newMinForDate);  // Replaces any old value.
         }
     }
 
+    /** This calculates the mean throughput value per day */
     public void Mean(ThroughputEntry chartModel) {
 
         // Check if the newDayCheck var has been set, if not set it to the current entryDay
@@ -264,7 +276,7 @@ public class ThroughputJSON {
                     valueForDate.add(BigDecimal.valueOf(chartModel.getThroughput()));
 
             if (null == newTotalForDate) {  // If we failed to get new value.
-                // TODO: Handle error condition.
+                logger.fatal("Null value in Mean");
             } else {  // Else normal, we have a new total. Store it in map.
 
                 dayCount++;
@@ -274,6 +286,7 @@ public class ThroughputJSON {
         }
     }
 
+    /** This extrapolates the expected function of the passed in datasets */
     public void Extrapolate(ThroughputEntry chartModel, int version) {
 
         double[] extrapolationData;
@@ -340,6 +353,7 @@ public class ThroughputJSON {
         }
     }
 
+    /** This is the linearExtrapolation function which uses the Jama lib to do simpleRegresion to plot our function line */
     public double[] linearExtrapolation(double[] x, double[] y, double[] xi) {
         SimpleRegression reg = new SimpleRegression();
         for (int i = 0; i < x.length; i++) {
@@ -353,6 +367,8 @@ public class ThroughputJSON {
         return yi;
     }
 
+    /** This is the polynomialRegresion class which uses the Jama lib to do simpleRegresion to plot our function line
+     * This class was found at: http://algs4.cs.princeton.edu/14analysis/PolynomialRegression.java.html */
     public double[] polynomialRegresion(double[] x, double[] y, double xi[], int grade) {
         System.out.println(grade);
         PolynomialRegression regression = new PolynomialRegression(x, y, grade);
@@ -365,7 +381,8 @@ public class ThroughputJSON {
         return yi;
     }
 
-
+    /** This Function uses Apache commons math lib to interpolate the data and then extrapolate
+     * I have modified the code found here: https://stackoverflow.com/questions/32076041/extrapolation-in-java*/
     // Data returned grows for large input of y1 e.g. 10000~, same vale returned for small input of y1, e.g. 300~
     public static double[] LinearInterpolator(double[] x1, double[] y1, double[] x2) {
         final PolynomialSplineFunction function = new LinearInterpolator().interpolate(x1, y1);

@@ -1,6 +1,7 @@
 package operations;
 
 import db.DBConnection;
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -21,6 +22,7 @@ import java.util.List;
 public class PreProcessor extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
+    private static Logger logger = Logger.getLogger(PreProcessor.class.getName());
 
     public PreProcessor() {
         super();
@@ -46,7 +48,8 @@ public class PreProcessor extends HttpServlet {
         int grade =0;
         boolean go =false;
 
-
+        /** I put this together to do the calculations, was running out of time,
+         * this should be cleaned up */
         if(request.getParameter("throughput") != null){
             calcList.add("Throughput");
             go=true;
@@ -81,6 +84,9 @@ public class PreProcessor extends HttpServlet {
 
         JSONArray envAppList = new JSONArray();
 
+        /** Makes a connection to the DB and depending on the type parameter, will either
+         * pull all the env / application names from the DB for the dashboard GUI
+         * or will get the requested calculations */
         try (Connection connection = dbWork.getConnection()) {
             if(type.equals("list")) {
                 List<String> envList = dbWork.getEnvironments(connection);
@@ -102,6 +108,7 @@ public class PreProcessor extends HttpServlet {
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
+                        logger.fatal("Exception happen PreProcessor app / env array fill", e);
                     }
                 }
 
@@ -129,6 +136,7 @@ public class PreProcessor extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
+            logger.fatal("Exception happen PreProcessor", e);
         }
     }
 
